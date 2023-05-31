@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.neu.mapper.VideoMapper">
+	<select id="getAllVideo" resultType="Video">
+		select video_id videoId,
+		video_content videoContent,
+		video_disc videoDisc,
+		video_descrip videoDesc,
+		video_date videoDate,
+		video_name videoName,
+		video_pic videoPic from m_video
+	</select>
+
+	<select id="getVideoDetailById" resultType="Video">
+		select
+		video_content
+		videoContent,
+		video_user videoUser,
+		video_descrip videoDesc,
+		video_disc videoDisc,
+		video_date videoDate,
+		video_name videoName,
+		video_id videoId
+		from m_video
+		where video_id=#{videoId}
+	</select>
+    
+<insert id="addFavoriteVideo" parameterType="Video">
+    insert into m_collection values(#{0},#{1},#{2})
+     
+</insert>
+	<select id="getVideoCommentById" resultType="Video">
+		select 
+		c.video_id videoId,
+		comment_id commentId,
+		comment_content commentContent,
+		comment_date commentDate,
+		c.user_id userId,
+		u.user_name userName
+		from m_comment c
+		left join
+		m_user u
+		on
+		c.user_id = u.user_id
+		where
+		c.video_id=#{videoId}
+		order by comment_date desc
+	</select>
+
+<!--    <resultMap id="VideoResultMap" type="Video">   -->
+<!-- 	    <id property="videoId" column="videoId"/> -->
+<!--       	<result property="userId" column="userId"/> -->
+<!--       	<result property="videoContent" column="videoContent"/> -->
+<!--       	<result property="videoDisc" column="videoDisc"/> -->
+<!--       	<result property="videoDate" column="videoDate"/> -->
+<!--       	<result property="videoPic" column="videoPic"/> -->
+<!--       	<result property="videoName" column="videoName"/> -->
+<!--       	<result property="videoUser" column="videoUser"/> -->
+<!--       	<result property="videoDesc" column="videoDesc"/>      	 -->
+      	
+<!--       	video与comment一对多关系 -->
+<!--       	<collection property="comment" ofType="Comment"> -->
+<!--       	    <id property="commentId" column="commentId"/> -->
+<!--       	    <result property="videoId" column="videoId"/> -->
+<!--         	<result property="commentContent" column="commentContent"/> -->
+<!--         	<result property="commentDate" column="commentDate"/> -->
+<!--         	<result property="userId" column="userId"/> -->
+<!--         	<result property="userName" column="userName"/> -->
+<!--       	</collection> -->
+<!--       </resultMap> -->
+<!--       <select id="getVideoDetailById" resultType="Video"> -->
+<!-- 		select -->
+<!-- 		video_content -->
+<!-- 		videoContent, -->
+<!-- 		video_user videoUser, -->
+<!-- 		video_descrip videoDesc, -->
+<!-- 		video_disc videoDisc, -->
+<!-- 		video_date videoDate, -->
+<!-- 		video_name videoName, -->
+<!-- 		v.video_id videoId, -->
+<!-- 		c.comment_content commentContent, -->
+<!-- 		c.user_name userName, -->
+<!-- 		c.comment_date commentDate -->
+		
+<!-- 		from m_video v -->
+<!-- 		left join m_comment c -->
+<!-- 		on v.video_id = c.video_id -->
+<!-- 		where v.video_id=#{videoId} -->
+<!-- 	</select> -->
+</mapper>

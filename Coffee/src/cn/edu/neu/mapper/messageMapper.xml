@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.neu.mapper.MessageMapper">
+    <select id="findAllMessage" resultType="Message">
+        select  
+        message_id messageId,
+        message_content messageContent,
+        message_userName messageUserName  
+        from m_message
+    </select>
+    <insert id="insert" parameterType="Message">
+	    insert 
+	    into m_message
+	    values(#{messageId},#{messageContent},#{messageUserName});    
+	</insert>
+	<select id="findMessageBySearchKeyword" resultType="Message">
+		select message_id messageId,message_username messageUserName, message_content messageContent from m_message 
+		
+	</select>
+	<insert id="saveMessage" parameterType="Message">
+	    insert into m_message values(#{messageId},#{messageContent},#{messageUserName})
+	</insert>
+	<update id="doHandleMessage" parameterType="Message">
+		update m_message set message_username=#{messageUserName}，message_content=#{messageContent} where message_id=#{messageId}
+	</update>
+	<delete id="delete" parameterType="int">
+		delete from m_message where message_id=#{message_id}
+	</delete>
+	<select id="findMessageById" parameterType="int" resultType="Message">
+	    select message_content messageContent,message_id messageId,message_username messageUserName from m_message where message_id=#{messageId}
+	</select>
+</mapper>

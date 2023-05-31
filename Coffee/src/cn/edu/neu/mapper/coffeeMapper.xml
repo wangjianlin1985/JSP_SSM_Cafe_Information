@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="cn.edu.neu.mapper.CoffeeMapper">
+
+     <resultMap id="CoffeeResultMap" type="Coffee">  
+	    <id property="CoffeeId" column="CoffeeId"/>
+      	<result property="cateId" column="cateId"/>
+      	<result property="CoffeeName" column="CoffeeName"/>
+      	<result property="CoffeeDisc" column="CoffeeDisc"/>
+ 	    <result property="CoffeeDate" column="CoffeeDate"/>
+  
+     
+   
+      	<result property="CoffeePic" column="CoffeePic"/>
+      	
+      	<!-- Coffee与Pic一对多关系 -->
+      	<collection property="collections" ofType="Collection">
+      	    <id property="userId" column="userIds"/>
+      	    <result property="typId" column="typIds"/>
+        	<result property="collectionId" column="collections"/>
+      	</collection>
+      	</resultMap>
+    <select id="getNewCoffee" resultType="Coffee">
+		select coffee_id coffeeId,	cate_id cateId,coffee_name coffeeName,coffee_disc coffeeDisc,
+		coffee_pic coffeePic from m_coffee order by coffee_date desc limit 2
+	</select>
+	<select id="getSaleCoffee" resultType="Coffee">
+		select coffee_id coffeeId,cate_id cateId,coffee_name coffeeName,coffee_disc coffeeDisc,
+		coffee_pic coffeePic from m_coffee order by coffee_stock limit 1 
+	</select>
+
+
+	 <select id="findCoffeeByKeyword" parameterType="int" resultType="Coffee">
+		  select coffee_id coffeeId,cate_id cateId,coffee_name coffeeName,
+	   coffee_disc coffeeDisc,coffee_pic coffeePic
+		from m_coffee  where coffee_name like CONCAT('%',#{params.keyword},'%')
+		
+	</select>
+
+
+	<select id="getAllCoffee" resultType="Coffee">
+		select coffee_id coffeeId,
+			
+			cate_id cateId,
+			coffee_name coffeeName,
+			coffee_disc coffeeDisc,
+			coffee_pic coffeePic from m_coffee order by coffee_date desc 
+	</select>
+	 
+	<select id="getCoffeeByCate" resultType="Coffee">
+        select coffee_id coffeeId,coffee_name coffeeName,coffee_pic coffeePic,cate_id cateId  from m_coffee 
+      <if test="params.cateId!=null">
+        	where cate_id=#{params.cateId}
+        </if>
+    </select>
+    
+<insert id="addFavorite" parameterType="Map">
+    insert into m_collection values(#{coffeeId},#{typId},#{cateId},#{userId})    
+</insert>
+
+    <select id="getCoffeeDetailById" resultType="Coffee">
+  select coffee_id coffeeId,coffee_name coffeeName,coffee_disc coffeeDisc,coffee_pic coffeePic from m_coffee where coffee_id=#{coffeeId}
+      
+        </select>
+
+    
+    <select id="findCoffeeByUserId" resultType="Coffee">
+		select coffee_id coffeeId,coffee_area coffeeArea,coffee_name coffeeName from m_coffee
+		where coffee_id=#{coffeeId}
+	</select>
+	
+    <select id="findCollectionById" parameterType="int" resultMap="CoffeeResultMap">
+            select m_coffee.coffee_pic,m_coffee.coffee_name,m_coffee.coffee_disc,m_collection.coffee_id ,
+            m_collection.user_id from m_coffee LEFT JOIN m_collection on 
+            m_coffee.coffee_id=m_collection.user_id where m_collection.user_Id=#{userId}
+            
+        <!-- select m_coffee.coffee_pic,m_coffee.coffee_disc,m_coffee.coffee_name from
+         m_coffee LEFT JOIN m_collection on m_coffee.coffee_id=m_collection.coffee_id where
+          m_collection.user_Id=#{userId} -->
+          
+<!--      select coffee_id coffeeId,coffee_name coffeeName,coffee_disc coffeeDisc,c.collection_id collectionId 
+     from m_coffee w left 
+     join m_collection c 
+     on  w.coffee_id=c.collection_id 
+     where w.coffeeId=#{coffeeId} -->
+        </select>
+        	<select id="findCoffeeById" parameterType="int" resultType="Coffee">
+	    select coffee_id coffeeId,cate_id cateId,coffee_name coffeeName,coffee_disc coffeeDisc,coffee_pic coffeePic
+	    from m_coffee where coffee_id=#{coffeeId}
+	</select>
+		<update id="updateCoffee" parameterType="Coffee">
+	    update m_coffee set cate_id=#{cateId},coffee_name=#{coffeeName},coffee_disc=#{coffeeDisc},coffee_pic=#{coffeePic} 
+	    where coffee_id=#{coffeeId}
+	</update>
+	<insert id="saveCoffee" parameterType="Coffee">
+	    insert into m_coffee values(#{coffeeId},#{cateId},#{coffeeName},#{coffeeDisc},#{coffeePic},#{coffeeDate})
+	</insert>
+		<select id="findCoffeePicPahtesByCoffeeId" resultType="String">
+	    select pic_url picUrl from m_pic where coffee_id=#{coffeeId}	    
+	</select>
+		<delete id="delCoffeePic" >
+	    delete from m_pic where coffee_id = #{coffeeId}
+	</delete>
+		<delete id="delCoffee" >
+	    delete from m_coffee where coffee_id=#{coffeeId}
+	</delete>
+	<insert id="saveCoffeePics">
+		insert into m_pic values(null,#{coffeeId},#{coffeePic})
+	</insert>
+		<select id="findPicPath" resultType="String">
+	    select pic_url picUrl from m_pic where pic_id=#{picId}
+	</select>
+	<delete id="delCoffeePicById" parameterType="int">
+	    delete from m_pic where pic_id=#{picId} 
+	</delete>
+	<select id="findCoffeeBySearchKeyword" resultType="Coffee">
+		select g.coffee_id coffeeId,cate_id cateId,coffee_name coffeeName,coffee_disc coffeeDisc,coffee_pic coffeePic
+		from m_coffee g
+		<where>	    		    
+			
+			  <if test="params.cateId!=0 and params.cateId!=null">
+			    cate_id=#{params.cateId} 
+			  </if>
+			  <if test="params.coffeeNames!=null ">
+			   <foreach item="item" index="index" collection="params.coffeeNames"  >
+		        and coffee_name like CONCAT(CONCAT('%', #{params.coffeeNames[${index}]}), '%') 
+		      </foreach>
+		      </if>	
+	    </where>
+	</select>
+	<select id="findCoffeeIdsByCateId" resultType="String">
+	select coffee_id coffeeId from m_coffee where cate_id=#{cateId}
+	</select>
+</mapper>
